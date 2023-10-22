@@ -22,8 +22,8 @@
         </Console>
 
         <RollingFile name="file"
-                     fileName="${LOGS}/maakapyaar.log"
-                     filePattern="${LOGS}/%d{yyyy-MM,aux}/archive_%d{yyyy-MM-dd}_maakapyaar_%i.log">
+                     fileName="${LOGS}/infinity.log"
+                     filePattern="${LOGS}/%d{yyyy-MM,aux}/archive_%d{yyyy-MM-dd}_infinity_%i.log">
             <PatternLayout>
                 <pattern>${FILE_PATTERN_LAYOUT}</pattern>
             </PatternLayout>
@@ -35,8 +35,8 @@
         </RollingFile>
 
         <RollingFile name="audit"
-                     fileName="${LOGS}/maakapyaar_audit.log"
-                     filePattern="${LOGS}/%d{yyyy-MM,aux}/archive_%d{yyyy-MM-dd}_maakapyaar_audit_%i.log">
+                     fileName="${LOGS}/infinity_audit.log"
+                     filePattern="${LOGS}/%d{yyyy-MM,aux}/archive_%d{yyyy-MM-dd}_infinity_audit_%i.log">
             <PatternLayout>
                 <pattern>${AUDIT_PATTERN_LAYOUT}</pattern>
             </PatternLayout>
@@ -62,7 +62,7 @@
         <logger name="audit" level="INFO">
             <AppenderRef ref="audit" />
         </logger>
-        <Logger name="com.maakapyaar" level="debug" additivity="false">
+        <Logger name="com.infinity" level="debug" additivity="false">
             <AppenderRef ref="file" />
             <AppenderRef ref="Console" />
             <!-- <AppenderRef ref="NatsAppender" /> -->
