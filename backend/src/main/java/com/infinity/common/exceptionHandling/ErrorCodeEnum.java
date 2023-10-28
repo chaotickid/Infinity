@@ -9,6 +9,8 @@ public enum ErrorCodeEnum {
     ER1000("ER1000", "User creation failed failed"),
     ER1001("ER1001", "User is already present"),
     ER1002("ER1002", "Either email id or password is blank"),
+    ER1003("ER1003", "User not found"),
+    ER1004("ER1004", "Invalid username or password"),
 
     //order-management [ER3000-ER4999]
 

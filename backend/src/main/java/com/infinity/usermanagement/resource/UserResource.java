@@ -1,6 +1,7 @@
 package com.infinity.usermanagement.resource;
 
 import com.infinity.usermanagement.model.document.User;
+import com.infinity.usermanagement.model.view.JWTToken;
 import com.infinity.usermanagement.model.view.UserVM;
 import com.infinity.usermanagement.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,5 +24,11 @@ public class UserResource {
         User systemUser1 = userService.addUser(signUpRequest);
         log.debug("Successfully created user for email: {}", systemUser1.getEmail());
         return new ResponseEntity<>(systemUser1, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/signin")
+    public ResponseEntity<JWTToken> signin(@RequestBody UserVM signInRequest) {
+        log.debug("User sign in requested =>");
+        return new ResponseEntity<>(userService.getUserDetails(signInRequest), HttpStatus.CREATED);
     }
 }

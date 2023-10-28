@@ -9,6 +9,8 @@ import org.springframework.data.couchbase.core.mapping.Field;
 import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,4 +29,7 @@ public class User {
 
     @Field
     private String role;
+
+    @Field
+    private String uuid = UUID.randomUUID().toString();
 }

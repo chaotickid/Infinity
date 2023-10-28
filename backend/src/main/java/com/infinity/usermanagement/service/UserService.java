@@ -3,9 +3,11 @@ package com.infinity.usermanagement.service;
 import com.infinity.common.constants.Constants;
 import com.infinity.common.exceptionHandling.CustomResponseException;
 import com.infinity.common.exceptionHandling.ErrorCodeEnum;
+import com.infinity.common.utils.JwtTokenProvider;
 import com.infinity.couchbaseRefereceListMaintainer.UserReferenceList;
 import com.infinity.usermanagement.config.UserConfigs;
 import com.infinity.usermanagement.model.document.User;
+import com.infinity.usermanagement.model.view.JWTToken;
 import com.infinity.usermanagement.model.view.UserVM;
 import com.infinity.usermanagement.repository.UserReferenceListMaintainer;
 import com.infinity.usermanagement.repository.UserRepository;
@@ -42,6 +44,12 @@ public class UserService {
     @Autowired
     private UserConfigs userConfigs;
 
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     /***
      * This method used to create user
      *
@@ -72,6 +80,29 @@ public class UserService {
         return user;
     }
 
+    public JWTToken getUserDetails(UserVM signInRequest) {
+        Optional<User> fetchedUser = Optional.empty();
+        if (StringUtils.isBlank(signInRequest.getEmail()) || StringUtils.isBlank(signInRequest.getPassword())) {
+            log.error("Either email id or password is blank");
+            throw new CustomResponseException(request, ErrorCodeEnum.ER1002, HttpStatus.BAD_REQUEST);
+        }
+        fetchedUser = userRepository.findByEmail(signInRequest.getEmail());
+        if(fetchedUser.isEmpty()){
+            log.error("User not found with email: {}", signInRequest.getEmail());
+            throw new CustomResponseException(request, ErrorCodeEnum.ER1003, HttpStatus.UNAUTHORIZED);
+        }
+        try {
+            log.debug("Validated user name successfully");
+            passwordVerification(signInRequest.getPassword(), fetchedUser.get());
+        } catch (Exception e){
+            log.error("Exception occurred while fetching user, Reason: {}", e.getMessage());
+            throw new CustomResponseException(request, ErrorCodeEnum.ER1004, HttpStatus.UNAUTHORIZED);
+        }
+        JWTToken newJwtToken = new JWTToken();
+        newJwtToken.setIdToken(jwtTokenProvider.createToken(fetchedUser.get()));
+        return newJwtToken;
+    }
+
     private String addUserToReferenceList() {
         Optional<UserReferenceList> userReferenceList = userReferenceListMaintainer.findById("UserReferenceList");
         if (userReferenceList.isPresent()) {
@@ -95,4 +126,12 @@ public class UserService {
         userReferenceListMaintainer.save(userReferenceList1);
         return userConfigs.getInitialValue();
     }
+
+    public void passwordVerification(String password, User user) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            log.debug("Incorrect password found");
+            throw new CustomResponseException(request, ErrorCodeEnum.ER1004, HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 }
